@@ -1,0 +1,8 @@
+---
+
+- name: Get "{{ instanceState }}" instances
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "{{ instanceState }}" ]
+  register: list

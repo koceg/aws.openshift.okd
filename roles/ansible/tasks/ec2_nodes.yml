@@ -1,0 +1,35 @@
+- name: Get Worker Nodes
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      "tag:node": worker
+  register: instances
+
+- name: Get Master Nodes
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      "tag:node": master
+  register: masters
+
+- name: Generate OpenShift File
+  local_action:
+    module: template
+    src: "{{ role_path }}/templates/openshift.j2"
+    dest: "{{ role_path }}/files/openshift.gen"
+
+- name: Get StandAlone Registry Nodes
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      "tag:node": registry
+  register: registry
+
+- name: Generate OpenShift Registry File
+  local_action:
+    module: template
+    src: "{{ role_path }}/templates/registry.j2"
+    dest: "{{ role_path }}/files/registry.gen"

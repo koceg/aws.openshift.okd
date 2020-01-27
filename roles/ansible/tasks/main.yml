@@ -1,0 +1,24 @@
+---
+
+- name: Create VPC Ansible Host
+  ec2:
+    key_name: "{{ sshKey }}"
+    groups: "{{ groupName }}"
+    assign_public_ip: yes
+    vpc_subnet_id: "{{ subnet.subnet.id }}"
+    exact_count: "{{ ansibleCount }}"
+    count_tag:
+      node: ansible
+    instance_tags:
+      node: ansible
+    image: "{{ awsImage }}"
+    instance_type: "{{ ansibleType }}"
+    region: "{{ awsRegion }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: "{{ ansibleVolumeSize }}"
+        delete_on_termination: yes
+    wait: "{{ ansibleHostWait }}"
+
+- include_tasks: ec2_nodes.yml

@@ -1,0 +1,14 @@
+---
+
+- set_fact:
+    instanceState: running
+
+- include: get_instance_state.yml
+
+- name: Stop "{{ instanceState }}" instances
+  ec2:
+    region: "{{ awsRegion }}"
+    state: stopped
+    instance_ids: "{{ item.instance_id }}"
+  loop: "{{ list.instances }}"
+  no_log: true

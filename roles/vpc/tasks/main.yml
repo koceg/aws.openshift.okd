@@ -1,0 +1,65 @@
+---
+
+- name: Create OpenShift Network
+  ec2_vpc_net:
+    region: "{{ awsRegion }}"
+    cidr_block: "{{ okdCidrBlock }}"
+    name: "{{ groupName }}"
+    tags: 
+      Name: "{{ groupName }}"
+  register: vpc
+
+- name: Create OpenShift Subnet
+  ec2_vpc_subnet:
+    region: "{{ awsRegion }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    cidr: "{{ okdCidrBlock }}"
+    tags: 
+      Name: "{{ groupName }}"
+  register: subnet
+
+- name: Create OpenShift Gateway
+  ec2_vpc_igw:
+    region: "{{ awsRegion }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    tags: 
+      Name: "{{ groupName }}"
+  register: gateway
+
+- name: Create OpenShift Route Table
+  ec2_vpc_route_table:
+    region: "{{ awsRegion }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    subnets:
+      - "{{ subnet.subnet.id }}"
+    routes:
+    - dest: "{{ www }}"
+      gateway_id: "{{ gateway.gateway_id }}"
+    tags: 
+      Name: "{{ groupName }}"
+
+- name: Create OpenShift Firewall
+  ec2_group:
+    name: "{{ groupName }}"
+    description: "OpenShift VPC Inbound Rules"
+    region: "{{ awsRegion }}"
+    vpc_id: "{{ vpc.vpc.id }}"
+    rules:
+      - proto: all
+        cidr_ip: "{{ okdCidrBlock }}"
+      - proto: tcp
+        ports:
+          - 22
+          - 80
+          - 443
+          - 8443
+          - 8444
+        cidr_ip: "{{ www }}"
+    tags: 
+      Name: "{{ groupName }}"
+
+- name: Create OpenShift SSH Public Key
+  ec2_key:
+    name: "{{ sshKey }}"
+    region: "{{ awsRegion }}"
+    key_material: "{{ sshPublicKey }}"

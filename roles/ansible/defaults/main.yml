@@ -1,0 +1,6 @@
+---
+
+ansibleType: t2.micro
+ansibleCount: 1
+ansibleVolumeSize: 20
+ansibleHostWait: yes

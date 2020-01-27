@@ -1,0 +1,19 @@
+---
+
+- set_fact:
+    instanceState: stopped
+
+- include: get_instance_state.yml
+
+
+- name: Start "{{ instanceState }}" instances
+  ec2:
+    region: "{{ awsRegion }}"
+    state: running
+    instance_ids: "{{ item.instance_id }}"
+  loop: "{{ list.instances }}"
+  no_log: true
+
+- name: Waiting for Instance Initialisation
+  pause:
+    seconds: 30

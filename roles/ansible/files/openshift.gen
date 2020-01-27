@@ -1,0 +1,28 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_deployment_type=origin
+openshift_disable_check=memory_availability,disk_availability
+openshift_release=3.11
+openshift_cluster_monitoring_operator_install=false
+ansible_service_broker_install=false
+openshift_enable_service_catalog=false
+openshift_metrics_install_metrics=false
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_users={'admin': '$apr1$ZwBFvtHn$Iglz3JWMnlC10fcuoQrXR1', 'developer': '$apr1$df1HtqDE$UKQ/41L23vB1IuG/.AZIt.'}
+oreg_test_login=false
+
+[nodes]
+10.0.0.127 openshift_node_group_name='node-config-compute'
+10.0.0.108 openshift_node_group_name='node-config-compute'
+10.0.0.240 openshift_node_group_name='node-config-master-infra'
+
+[masters]
+10.0.0.240
+
+[etcd]
+10.0.0.240

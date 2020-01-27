@@ -1,0 +1,22 @@
+---
+
+- include_tasks: nodes.yml
+  loop:
+    - type: worker
+      count: "{{ workerCount }}"
+      size: "{{ workerType }}"
+      volumeSize: "{{ workerVolume }}"
+      volumeDelete: "{{ workerVolumeDelete }}"
+      createWait: "{{ workerWait }}"
+    - type: master
+      count: "{{ masterCount }}"
+      size: "{{ masterType }}"
+      volumeSize: "{{ masterVolume }}"
+      volumeDelete: "{{ masterVolumeDelete }}"
+      createWait: "{{ masterWait }}"
+    - type: registry
+      count: "{{ registryCount }}"
+      size: "{{ registryType }}"
+      volumeSize: "{{ registryVolume }}"
+      volumeDelete: "{{ registryVolumeDelete }}"
+      createWait: "{{ registryWait }}"

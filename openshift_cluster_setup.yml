@@ -1,0 +1,14 @@
+--- 
+- name: OpenShift AWS Cluster Nodes Setup
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    awsRegion: eu-central-1
+    sshKey: openshift
+    groupName: openshift
+    awsImage: ami-04cf43aca3e6f3de3
+  roles:
+    - vpc
+    - nodes
+    - ansible

@@ -1,0 +1,19 @@
+---
+
+- include_tasks: start.yml
+  when: state == 'start'
+
+- include_tasks: stop.yml
+  when: state == 'stop'
+
+- include_tasks: delete.yml
+  loop:
+    - type: worker
+      size: "{{ workerType }}"
+    - type: master
+      size: "{{ masterType }}"
+    - type: registry
+      size: "{{ registryType }}"
+    - type: ansible
+      size: "{{ ansibleType }}"
+  when: state == 'delete'

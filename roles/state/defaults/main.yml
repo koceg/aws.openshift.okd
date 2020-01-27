@@ -1,0 +1,6 @@
+---
+
+workerType: t3.large
+masterType: t3.large
+registryType: t3.large
+ansibleType: t2.micro

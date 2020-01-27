@@ -1,0 +1,13 @@
+---
+
+- name: Remove "{{ item.type }}" nodes
+  ec2:
+    exact_count: 0
+    count_tag:
+      node: "{{ item.type }}"
+    instance_tags:
+      node: "{{ item.type }}"
+    image: "{{ awsImage }}"
+    instance_type: "{{ item.size }}"
+    region: "{{ awsRegion }}"
+  no_log: true
