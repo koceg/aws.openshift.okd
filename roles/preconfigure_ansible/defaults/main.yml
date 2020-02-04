@@ -1,0 +1,22 @@
+---
+
+ansibleHome: /home/centos
+ansibleRepoUrl: https://github.com/openshift/openshift-ansible.git
+openshiftRelease: release-3.11
+ansibleFiles:
+  - requirements.txt
+  - openshift.gen
+  - registry.gen
+  - aws
+ansiblePackages:
+  - screen
+  - git
+# - selinux
+  - httpd-tools
+  - rh-python36
+  - java-1.8.0-openjdk-headless
+  - python-pip
+pythonInstallPath: /opt/rh/rh-python36/root/bin/
+softLinks:
+  - python3
+  - ansible-playbook

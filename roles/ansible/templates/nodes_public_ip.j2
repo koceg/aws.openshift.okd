@@ -1,0 +1,10 @@
+[openshift_nodes]
+{% for item in instances.instances %}
+{{ item.public_ip_address }}
+{% endfor %}
+{% for item in masters.instances %}
+{{ item.public_ip_address }}
+{% endfor %}
+
+[ansible]
+{{ ansible.instances[0].public_ip_address }}

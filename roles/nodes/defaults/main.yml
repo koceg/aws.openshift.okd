@@ -11,7 +11,7 @@ masterVolume: 30
 masterVolumeDelete: yes
 masterWait: yes
 registryType: t3.large
-registryCount: 0
-registryVolume: 30
+registryCount: 1
+registryVolume: 50
 registryVolumeDelete: yes
 registryWait: yes

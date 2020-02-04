@@ -19,4 +19,4 @@
         volume_size: "{{ item.volumeSize }}"
         delete_on_termination: "{{ item.volumeDelete }}"
     wait: "{{ item.createWait }}"
-  when: item.count > 0
+  #  when: item.count > 0

@@ -1,0 +1,10 @@
+--- 
+- name: Configure Ansible Node
+  hosts: ansible
+  roles:
+    - preconfigure_ansible
+
+- name: Configure OpenShift Nodes
+  hosts: openshift_nodes
+  roles:
+    - preconfigure_nodes

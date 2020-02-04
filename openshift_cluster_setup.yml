@@ -12,3 +12,20 @@
     - vpc
     - nodes
     - ansible
+  vars_prompt:
+    - name: workerCount
+      prompt: "Worker Nodes"
+      private: no
+      default: 2
+    - name: masterCount
+      prompt: "Master Nodes"
+      private: no
+      default: 1
+    - name: registryCount
+      prompt: "Create Standalone Registry? (yes->1 / no->0)"
+      private: no
+      default: 0
+    - name: ansibleInstall
+      prompt: "Create Ansible Host? (yes->1 / no->0)"
+      private: no
+      default: 1
