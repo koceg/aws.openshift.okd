@@ -1,0 +1,28 @@
+---
+
+- name: "Get Username"
+  pause:
+      prompt: "Provide AWS access key"
+  register: awsId
+  no_log: true
+
+- name: "Get Password"
+  pause:
+      prompt: "Provide AWS secret key"
+      echo: no
+  register: awsKey
+  no_log: true
+
+- name: "Create {{ awsDir }}{{ awsFile }}"
+  file:
+    state: directory
+    dest: "{{ awsDir }}"
+
+- name: Write AWS credentials
+  local_action:
+    module: copy
+    dest: "{{ awsDir }}{{ awsFile }}"
+    content: |
+      [default]
+      aws_access_key_id={{ awsId['user_input'] }}
+      aws_secret_access_key={{ awsKey['user_input'] }}

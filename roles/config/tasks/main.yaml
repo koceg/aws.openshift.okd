@@ -1,0 +1,11 @@
+---
+- name: "Get {{ awsDir }}{{ awsFile }}"
+  stat:
+    path: "{{ awsDir }}{{ awsFile }}"
+  register: configFile
+
+- include_tasks: aws.yaml
+  when: configFile.stat.exists != true
+
+- include_tasks: config.yaml
+  when: configRemove == 'yes'

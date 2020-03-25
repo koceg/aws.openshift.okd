@@ -1,0 +1,89 @@
+---
+
+- name: Remove Bootstrap  node
+  ec2:
+    exact_count: 0
+    count_tag:
+      node: bootstrap
+      cluster: "{{ clusterID }}"
+    instance_tags:
+      node: bootstrap
+      cluster: "{{ clusterID }}"
+    image: "{{ awsImage }}"
+    instance_type: "{{ bootstrapType }}"
+    region: "{{ awsRegion }}"
+  when: workerCount|int > 0
+
+- name: "Upload bootstrap File to s3 Bucket {{ domainName }}"
+  aws_s3:
+    mode: put
+    bucket: "{{ domainName }}"
+    src: "{{ ignitionFile }}"
+    permission: 'public-read'
+    overwrite: different
+    object: bootstrap.ign
+
+- include_tasks: nodes.yaml
+  loop:
+    - type: bootstrap
+      userData: "{{ bootstrapFile }}"
+      count: "{{ bootstrapCount }}"
+      size: "{{ bootstrapType }}"
+      volumeSize: "{{ bootstrapVolume }}"
+      volumeDelete: "{{ bootstrapVolumeDelete }}"
+      createWait: "{{ bootstrapWait }}"
+  loop_control:
+    loop_var: ec2
+  when: workerCount|int == 0
+
+- name: Get Bootstrap Node
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      tag:node: bootstrap
+      tag:cluster: "{{ clusterID }}"
+  register: bootstrap
+
+- include_role:
+    name: dns
+
+- include_tasks: nodes.yaml
+  loop:
+    - type: master
+      userData: "{{ masterFile }}"
+      count: "{{ masterCount }}"
+      size: "{{ masterType }}"
+      volumeSize: "{{ masterVolume }}"
+      volumeDelete: "{{ masterVolumeDelete }}"
+      createWait: "{{ masterWait }}"
+    - type: worker
+      userData: "{{ workerFile }}"
+      count: "{{ workerCount }}"
+      size: "{{ workerType }}"
+      volumeSize: "{{ workerVolume }}"
+      volumeDelete: "{{ workerVolumeDelete }}"
+      createWait: "{{ workerWait }}"
+  loop_control:
+    loop_var: ec2
+
+- name: Get Worker Nodes
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      tag:node: worker
+      tag:cluster: "{{ clusterID }}"
+  register: worker
+
+- name: Get Master Nodes
+  ec2_instance_info:
+    region: "{{ awsRegion }}"
+    filters:
+      instance-state-name: [ "running" ]
+      tag:node: master
+      tag:cluster: "{{ clusterID }}"
+  register: master
+
+- include_role:
+    name: dns

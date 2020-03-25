@@ -1,0 +1,34 @@
+---
+
+- block:
+  - name: "api.{{ clusterName }}.{{ domainName }} DNS Record"
+    route53:
+      state: present
+      overwrite: yes
+      type: A
+      zone: "{{ domainName }}"
+      record: "api.{{ clusterName }}.{{ domainName }}"
+      value: |
+        {{ item.instances | json_query('[*].public_ip_address') }}
+
+  - name: "api-int.{{ clusterName }}.{{ domainName }} DNS Record"
+    route53:
+      state: present
+      overwrite: yes
+      type: A
+      zone: "{{ domainName }}"
+      record: "api-int.{{ clusterName }}.{{ domainName }}"
+      value: |
+        {{ item.instances | json_query('[*].private_ip_address') }}
+  when: item.type == 'bootstrap' or item.type == 'master'
+
+- name: "*.apps.{{ clusterName }}.{{ domainName }} DNS Record"
+  route53:
+    state: present
+    overwrite: yes
+    type: A
+    zone: "{{ domainName }}"
+    record: "*.apps.{{ clusterName }}.{{ domainName }}"
+    value: |
+      {{ item.instances | json_query('[*].public_ip_address') }}
+  when: item.type != 'bootstrap'

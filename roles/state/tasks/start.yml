@@ -5,7 +5,6 @@
 
 - include: get_instance_state.yml
 
-
 - name: Start "{{ instanceState }}" instances
   ec2:
     region: "{{ awsRegion }}"

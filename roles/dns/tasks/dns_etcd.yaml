@@ -1,0 +1,10 @@
+---
+
+- name: "etcd-{{ masterIndex }}.{{ clusterName }}.{{ domainName }} DNS Record"
+  route53:
+    state: present
+    overwrite: yes
+    type: A
+    zone: "{{ domainName }}"
+    record: "etcd-{{ masterIndex }}.{{ clusterName }}.{{ domainName }}"
+    value: "{{ etcd.private_ip_address }}"

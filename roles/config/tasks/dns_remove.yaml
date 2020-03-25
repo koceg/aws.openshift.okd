@@ -1,0 +1,19 @@
+---
+
+- name: "Get DNS Record {{ item }}"
+  route53:
+    state: get
+    zone: "{{ domainName }}"
+    record: "{{ item }}"
+    type: A
+  register: rec
+
+- name: "Remove DNS Record {{ item }}"
+  route53:
+    state: absent
+    zone: "{{ domainName }}"
+    record: "{{ rec.set.record }}"
+    ttl: "{{ rec.set.ttl }}"
+    type: "{{ rec.set.type }}"
+    value: "{{ rec.set.value }}"
+  when: rec.set.record is defined

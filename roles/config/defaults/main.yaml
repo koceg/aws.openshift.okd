@@ -1,0 +1,7 @@
+---
+sshPublicKey: 'ssh-rsa CHANGE ME'
+awsDir: "~/.aws/"
+awsFile: credentials
+config: "{{ playbook_dir }}/config"
+manifest: "{{ playbook_dir }}/manifest"
+ignition: "{{ playbook_dir }}/ignition"

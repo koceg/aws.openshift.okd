@@ -1,0 +1,26 @@
+--- 
+- name: OpenShift Cluster State
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    workerType: m5.large
+    masterType: m5.xlarge
+  roles:
+    - state
+  vars_prompt:
+    - name: state
+      prompt: "Cluster state (start/stop/delete)"
+      private: no
+    - name: awsRegion
+      prompt: "Cluster region"
+      private: no
+      default: eu-central-1
+    - name: clusterID
+      prompt: "Cluster ID"
+      private: no
+      default: clusterName-xxxxx
+    - name: awsImage
+      prompt: "AWS Image Used"
+      private: no
+      default: ami-0ba972a092c75321f

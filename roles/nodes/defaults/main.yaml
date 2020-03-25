@@ -1,0 +1,28 @@
+---
+
+workerType: m5.large
+workerCount: 2
+workerVolume: 80
+workerVolumeDelete: yes
+workerWait: yes
+masterType: m5.xlarge
+masterCount: 3
+masterVolume: 80
+masterVolumeDelete: yes
+masterWait: yes
+bootstrapType: m5.xlarge
+bootstrapCount: 1
+bootstrapVolume: 80
+bootstrapVolumeDelete: yes
+bootstrapWait: yes
+
+ignition: "{{ playbook_dir }}/ignition"
+ignitionFile: "{{ ignition }}/bootstrap.ign"
+metadataFile: "{{ ignition }}/metadata.json"
+clusterID: "{{ (lookup('file', metadataFile )|from_json).get('infraID') }}"
+bootstrapIGN: "{{ role_path }}/files/bootstrap.ign"
+workerIGN: "{{ ignition }}/worker.ign"
+masterIGN: "{{ ignition }}/master.ign"
+workerFile: "{{ lookup('file', workerIGN )|b64encode }}"
+masterFile: "{{ lookup('file', masterIGN )|b64encode }}"
+bootstrapFile: "{{ lookup('file', bootstrapIGN )|b64encode }}"

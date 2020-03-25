@@ -1,0 +1,56 @@
+---
+
+- name: "Removing config,manifest and ignition directories"
+  file:
+    state: absent
+    dest: "{{ item }}"
+  loop:
+    - "{{ config }}"
+    - "{{ manifest }}"
+    - "{{ ignition }}"
+
+- name: "Removing DNS Records"
+  include_tasks: dns_remove.yaml
+  loop:
+    - "api.{{ clusterName }}.{{ domainName }}"
+    - "api-int.{{ clusterName }}.{{ domainName }}"
+    - "*.apps.{{ clusterName }}.{{ domainName }}"
+
+- name: "Create config directory"
+  file:
+    state: directory
+    dest: "{{ config }}"
+
+- name: Process install-config Template
+  local_action:
+    module: template
+    src: "{{ role_path }}/templates/install_config.j2"
+    dest: "{{ config }}/install-config.yaml"
+
+- name: Copy config folder to manifest
+  local_action:
+    module: copy
+    src: "{{ config }}/"
+    dest: "{{ manifest }}/"
+
+- name: Create manifest-configs
+  command:
+    argv:
+      - openshift-install
+      - create
+      - manifests
+      - "--dir={{ manifest }}"
+
+- name: Copy manifest folder to ignition
+  local_action:
+    module: copy
+    src: "{{ manifest }}/"
+    dest: "{{ ignition }}/"
+
+- name: Create ignition-configs
+  command:
+    argv:
+      - openshift-install
+      - create
+      - ignition-configs
+      - '--dir={{ ignition }}'

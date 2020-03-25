@@ -1,0 +1,41 @@
+---
+
+- name: Create EC2 {{ ec2.type }} template
+  ec2_launch_template:
+    region: "{{ awsRegion }}"
+    template_name: "{{ ec2.type }}"
+    image_id: "{{ awsImage }}"
+    instance_type: "{{ ec2.size }}"
+    user_data: "{{ ec2.userData }}"
+    network_interfaces:
+      - associate_public_ip_address: yes
+        device_index: 0
+        subnet_id: "{{ subnet.subnet.id }}"
+        groups:
+          - "{{ securityGroup.group_id }}"
+  register: template
+
+- name: Launching EC2 {{ ec2.type }} instance
+  ec2_instance:
+    wait: "{{ ec2.createWait }}"
+    region: "{{ awsRegion }}"
+    vpc_subnet_id: "{{ subnet.subnet.id }}"
+    instance_type: "{{ ec2.size }}"
+    filters:
+      instance-state-name: [ "running" ]
+      tag:node: "{{ ec2.type }}"
+      tag:cluster: "{{ clusterID }}"
+      tag:index: "{{ item|string }}"
+    launch_template:
+      id: "{{ template.template.launch_template_id }}"
+    tags:
+      node: "{{ ec2.type }}"
+      cluster: "{{ clusterID }}"
+      index: "{{ item }}"
+    volumes:
+      - device_name: /dev/xvda
+        ebs:
+          delete_on_termination: "{{ ec2.volumeDelete }}"
+          volume_type: gp2
+          volume_size: "{{ ec2.volumeSize }}"
+  loop: "{{ range(0,(ec2.count|int),1)|list }}"

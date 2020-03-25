@@ -5,4 +5,5 @@
     region: "{{ awsRegion }}"
     filters:
       instance-state-name: [ "{{ instanceState }}" ]
+      cluster: "{{ clusterID }}"
   register: list

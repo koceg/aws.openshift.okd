@@ -7,15 +7,18 @@
     name: "{{ groupName }}"
     tags: 
       Name: "{{ groupName }}"
+      cluster: "{{ clusterID }}"
   register: vpc
 
 - name: Create OpenShift Subnet
   ec2_vpc_subnet:
     region: "{{ awsRegion }}"
+    az: "{{ awsRegion }}{{ awsZone }}"
     vpc_id: "{{ vpc.vpc.id }}"
     cidr: "{{ okdCidrBlock }}"
     tags: 
       Name: "{{ groupName }}"
+      cluster: "{{ clusterID }}"
   register: subnet
 
 - name: Create OpenShift Gateway
@@ -24,6 +27,7 @@
     vpc_id: "{{ vpc.vpc.id }}"
     tags: 
       Name: "{{ groupName }}"
+      cluster: "{{ clusterID }}"
   register: gateway
 
 - name: Create OpenShift Route Table
@@ -37,6 +41,7 @@
       gateway_id: "{{ gateway.gateway_id }}"
     tags: 
       Name: "{{ groupName }}"
+      cluster: "{{ clusterID }}"
 
 - name: Create OpenShift Firewall
   ec2_group:
@@ -52,14 +57,9 @@
           - 22
           - 80
           - 443
-          - 8443
-          - 8444
+          - 6443
         cidr_ip: "{{ www }}"
     tags: 
       Name: "{{ groupName }}"
-
-- name: Create OpenShift SSH Public Key
-  ec2_key:
-    name: "{{ sshKey }}"
-    region: "{{ awsRegion }}"
-    key_material: "{{ sshPublicKey }}"
+      cluster: "{{ clusterID }}"
+  register: securityGroup

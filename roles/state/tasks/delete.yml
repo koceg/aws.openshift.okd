@@ -5,8 +5,10 @@
     exact_count: 0
     count_tag:
       node: "{{ item.type }}"
+      cluster: "{{ clusterID }}"
     instance_tags:
       node: "{{ item.type }}"
+      cluster: "{{ clusterID }}"
     image: "{{ awsImage }}"
     instance_type: "{{ item.size }}"
     region: "{{ awsRegion }}"

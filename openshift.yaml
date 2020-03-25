@@ -1,0 +1,50 @@
+--- 
+- name: OpenShift 4.X AWS Cluster Install
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    groupName: openshift
+    sshKey: openshift
+  roles:
+    - config
+    - vpc
+    - nodes
+  vars_prompt:
+    - name: domainName
+      prompt: "OpenShift DNS Name"
+      private: no
+      default: example.com
+    - name: clusterName
+      prompt: "OpenShift Cluster Name"
+      private: no
+      default: openshift
+    - name: masterCount
+      prompt: "Master Nodes"
+      private: no
+      default: 3
+    - name: workerCount
+      prompt: "Worker Nodes"
+      private: no
+      default: 0
+    - name: awsRegion
+      prompt: "AWS Region"
+      private: no
+      default: eu-central-1
+    - name: awsZone
+      prompt: "AWS Zone (a,b,c)"
+      private: no
+      default: b
+    - name: awsImage
+      prompt: "AWS Image"
+      private: no
+      default: ami-0ba972a092c75321f
+    - name: secret
+      prompt: "Image Pull Secret (JSON stile)"
+      unsafe: yes
+      private: yes
+      default: '{"auths":{"fake":{"auth": "bar"}}}'
+    - name: configRemove
+      prompt: "New Cluster"
+      private: no
+      default: 'no'

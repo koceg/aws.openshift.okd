@@ -1,0 +1,51 @@
+---
+
+- include_tasks: dns.yaml
+  loop:
+    - type: bootstrap
+      instances: "{{ bootstrap.instances }}"
+  when:
+    - bootstrap is defined
+    - bootstrap.instances|count > 0
+    - workerCount|int == 0
+
+- include_tasks: dns.yaml
+  loop:
+    - type: master
+      instances: "{{ bootstrap.instances + master.instances }}"
+  when:
+    - master is defined
+    - master.instances|count > 2
+
+- include_tasks: dns.yaml
+  loop:
+    - type: worker
+      instances: "{{ master.instances + worker.instances }}"
+  when:
+    - worker is defined
+    - worker.instances|count > 0
+
+- name: "_etcd-server-ssl._tcp.{{ clusterName }}.{{ domainName }} DNS Record"
+  route53:
+    state: present
+    overwrite: yes
+    type: SRV
+    zone: "{{ domainName }}"
+    record: "_etcd-server-ssl._tcp.{{ clusterName }}.{{ domainName }}"
+    value: |-
+      {% for masterIndex in range(0,(masterCount|int)) %}
+          0 10 2380 etcd-{{ masterIndex }}.{{ clusterName }}.{{ domainName }}
+          {{ ',' if masterIndex < (masterCount|int - 1) }}
+      {% endfor %}
+  when:
+    - master is defined
+    - master.instances|count > 2
+
+- include_tasks: dns_etcd.yaml
+  loop: "{{ master.instances }}"
+  loop_control:
+    index_var: masterIndex
+    loop_var: etcd
+  when:
+    - master is defined
+    - master.instances|count > 2
