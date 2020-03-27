@@ -72,6 +72,41 @@ Once our playbook is finished provisioning our worker nodes we should run:<br>
 ```
 [openshift baremetal installation documentation](https://docs.openshift.com/container-platform/4.3/installing/installing_bare_metal/installing-bare-metal.html#installation-installing-bare-metal_installing-bare-metal) should provide extra information if something is left out of the process presented here
 
+### Configuring the registry
+	On platforms that do not provide shareable object storage, the OpenShift Image Registry Operator bootstraps itself as Removed.
+	This allows openshift-installer to complete installations on these platform types.
+
+Although we have installed our cluster on AWS,it is not aware of that because we've used the bare metal approach and there is no aws cloud permissions and credentials granted.
+
+ - create IAM user for programmatic access
+ - Grant [ S3 IAM Permissions ](https://github.com/docker/docker.github.io/blob/master/registry/storage-drivers/s3.md#s3-permission-scopes) to our user that we've created in the previous step and run the following command
+ ```
+oc create secret generic image-registry-private-configuration-user \
+--from-literal=REGISTRY_STORAGE_S3_ACCESSKEY=myaccesskey \
+--from-literal=REGISTRY_STORAGE_S3_SECRETKEY=mysecretkey \
+--namespace openshift-image-registry
+```
+
+```bash
+# last step is to make our internal registry aware of our s3 storage backend and enable it
+
+oc edit configs.imageregistry.operator.openshift.io/cluster
+# inside our editor
+(set spec->managementState: Managed)
+# and under storage we should add the following
+
+storage:
+  s3:
+    region: eu-central-1
+    bucket: ( bucket_name )
+    secure: true
+    v4auth: true
+    chunksize: 5242880
+```
+The following html pages should provide more than enough information for the why and the how<br>
+[Configuring the registry for bare metal](https://docs.openshift.com/container-platform/4.3/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)<br>
+[Configuring the registry for AWS user-provisioned infrastructure](https://docs.openshift.com/container-platform/4.3/registry/configuring_registry_storage/configuring-registry-storage-aws-user-infrastructure.html)<br>
+[S3 storage driver](https://github.com/docker/docker.github.io/blob/master/registry/storage-drivers/s3.md)
 
 ### Pitfalls 
 The way CoreOS is provisioned can be a bit of a challenge to troubleshoot if we have a running instance or if that instance is stuck booting.<br><br>
